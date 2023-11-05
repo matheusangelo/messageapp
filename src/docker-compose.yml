@@ -1,0 +1,30 @@
+version: '3'
+services:
+    queue:
+        image: rabbitmq
+        restart: always
+        environment:
+          - RABBITMQ_DEFAULT_USER=guest
+          - RABBITMQ_DEFAULT_PASS=guest
+        ports:
+          - "5672:5672"
+          - "15672:15672"
+    db:
+        image: mongo
+        restart: always
+        ports: 
+            - "27017:27017"
+    backend:
+        build: "./MessageApp.Web"
+        container_name: 'api'
+        ports: 
+            - "8000:8000"
+        depends_on: 
+            - db
+    worker:
+        build: "./MessageApp.Broker"
+        container_name: 'worker'
+        ports: 
+            - "8000:8000"
+        depends_on: 
+            - db
